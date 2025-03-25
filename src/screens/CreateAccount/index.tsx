@@ -1,25 +1,14 @@
 import {
-  View,
   Text,
-  StyleSheet,
   TextInput,
   TouchableOpacity,
-  Image,
+  View,
+  StyleSheet,
 } from "react-native";
 
-export default function Login({ navigation }: any) {
-
-  function handleNavigateToCreateAccount() {
-    navigation.navigate("CreateAccount");
-  }
-
+export default function CreateAccount() {
   return (
     <View style={styles.container}>
-
-        <Image
-                source={require("../../../assets/Logo.png")}
-                style={styles.bankLogo}
-              />
 
       <TextInput
         style={styles.input}
@@ -43,7 +32,7 @@ export default function Login({ navigation }: any) {
         <Text>Entrar</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity onPress={handleNavigateToCreateAccount}>
+      <TouchableOpacity>
         <Text style={[styles.linkText, { textAlign: "center" }]}>
           Criar conta
         </Text>
@@ -53,12 +42,7 @@ export default function Login({ navigation }: any) {
 }
 
 const styles = StyleSheet.create({
-    bankLogo: {
-        width: 250,
-      
-        alignSelf: "center",
-        objectFit: 'contain'
-      },
+    
   container: {
     flex: 1,
     backgroundColor: "#150230",

@@ -1,12 +1,11 @@
-import {
-  StyleSheet,
-  Text,
-  Image,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { StyleSheet, Text, Image, TouchableOpacity, View } from "react-native";
 
-export default function Intro() {
+export default function Intro({ navigation }: any) {
+
+  function handleNavigateToLogin() {
+    navigation.navigate("Login");
+  }
+
   return (
     <View style={styles.container}>
       <Text style={styles.bankName}>Your Bank</Text>
@@ -26,7 +25,11 @@ export default function Intro() {
 
       <View>
         <Text style={styles.title}>Um mundo financeiro sem complexidades!</Text>
-        <TouchableOpacity activeOpacity={0.8} style={styles.button}>
+        <TouchableOpacity
+          onPress={handleNavigateToLogin}
+          activeOpacity={0.8}
+          style={styles.button}
+        >
           <Text>Começar</Text>
         </TouchableOpacity>
       </View>
@@ -47,9 +50,10 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   bankLogo: {
-    width: 300,
-    height: 200,
+    width: 250,
+  
     alignSelf: "center",
+    objectFit: 'contain'
   },
   title: {
     color: "#fff",
