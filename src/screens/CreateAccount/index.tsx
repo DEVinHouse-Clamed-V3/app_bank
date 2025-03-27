@@ -20,40 +20,41 @@ export default function CreateAccount({ navigation }) {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
-  const handleCreateAccount = async () => {
-    try {
-      if (!name) {
-        Alert.alert("Aviso", "Preencha o campo nome completo");
-      } else if (!email) {
-        Alert.alert("Aviso", "Preencha o campo email");
-      } else if (!/^\d{3}\.\d{3}\.\d{3}-\d{2}$/.test(cpf)) {
-        Alert.alert(
-          "Aviso",
-          "Preencha o campo CPF no formato válido. Ex: 000.000.000-00"
-        );
-      } else if (password !== confirmPassword) {
-        Alert.alert("Aviso", "As senhas não coincidem");
-      } else {
-        await axios.post(
+  const handleCreateAccount = () => {
+    if (!name) {
+      Alert.alert("Aviso", "Preencha o campo nome completo");
+    } else if (!email) {
+      Alert.alert("Aviso", "Preencha o campo email");
+    } else if (!/^\d{3}\.\d{3}\.\d{3}-\d{2}$/.test(cpf)) {
+      Alert.alert(
+        "Aviso",
+        "Preencha o campo CPF no formato válido. Ex: 000.000.000-00"
+      );
+    } else if (password !== confirmPassword) {
+      Alert.alert("Aviso", "As senhas não coincidem");
+    } else {
+      axios
+        .post(
           "http://192.168.0.37:3000/users",
           {
             name: name,
             email: email,
             cpf: cpf,
             password: password,
-          }
-          // {
-          //   headers: {
-          //     "Content-Type": "application/json",
-          //   },
-          // }
-        );
-
-        Alert.alert("Sucesso", "Conta criada com sucesso!");
-        navigation.navigate("Login");
-      }
-    } catch (error) {
-      Alert.alert("Erro", "Não possível criar a conta");
+          },
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+           }
+        )
+        .then(() => {
+          Alert.alert("Sucesso", "Conta criada com sucesso!");
+          navigation.navigate("Login");
+        })
+        .catch((error) => {
+          Alert.alert("Erro", "Não possível criar a conta");
+        })
     }
   };
 

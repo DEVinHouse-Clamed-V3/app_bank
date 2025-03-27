@@ -1,3 +1,5 @@
+import axios from "axios";
+import { useState } from "react";
 import {
   View,
   Text,
@@ -5,27 +7,61 @@ import {
   TextInput,
   TouchableOpacity,
   Image,
+  Alert,
 } from "react-native";
 
 export default function Login({ navigation }: any) {
+
+  const [cpf, setCpf] = useState("");
+  const [password, setPassword] = useState("");
 
   function handleNavigateToCreateAccount() {
     navigation.navigate("CreateAccount");
   }
 
+  function handleLogin() {
+    if(!cpf || !password) {
+      Alert.alert("Aviso", "Preencha todos os campos")
+    } else {
+      axios.post(
+        "http://192.168.0.37:3000/login",
+        {
+          cpf: cpf,
+          password: password
+        }
+      )
+      .then((response) => {
+
+        const token = response.data.token
+
+        Alert.alert("Sucesso", token)
+        navigation.navigate("Home")
+      })
+      .catch(() => {
+        Alert.alert("Erro", "Crendeciais incorretas")
+      }) 
+    }
+  }
+
+  // function handleChangeCpf(value: string) {
+  //   const cpfOnlyDigits = value.replace(/\D/g, '')
+  //   setCpf(cpfOnlyDigits)
+  // }
+
   return (
     <View style={styles.container}>
-
-        <Image
-                source={require("../../../assets/Logo.png")}
-                style={styles.bankLogo}
-              />
+      <Image
+        source={require("../../../assets/Logo.png")}
+        style={styles.bankLogo}
+      />
 
       <TextInput
         style={styles.input}
         placeholder="CPF"
         cursorColor="#150230"
         keyboardType="number-pad"
+        value={cpf}
+        onChangeText={setCpf}
       />
 
       <TextInput
@@ -33,13 +69,15 @@ export default function Login({ navigation }: any) {
         placeholder="Password"
         cursorColor="#150230"
         secureTextEntry
+        value={password}
+        onChangeText={setPassword}
       />
 
       <TouchableOpacity>
         <Text style={styles.linkText}>Esqueceu a senha ?</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity style={styles.buttonLogin}>
+      <TouchableOpacity onPress={handleLogin} style={styles.buttonLogin}>
         <Text>Entrar</Text>
       </TouchableOpacity>
 
@@ -53,12 +91,12 @@ export default function Login({ navigation }: any) {
 }
 
 const styles = StyleSheet.create({
-    bankLogo: {
-        width: 250,
-      
-        alignSelf: "center",
-        objectFit: 'contain'
-      },
+  bankLogo: {
+    width: 250,
+
+    alignSelf: "center",
+    objectFit: "contain",
+  },
   container: {
     flex: 1,
     backgroundColor: "#150230",
