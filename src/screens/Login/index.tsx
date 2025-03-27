@@ -35,7 +35,7 @@ export default function Login({ navigation }: any) {
         const token = response.data.token
 
         Alert.alert("Sucesso", token)
-        navigation.navigate("Home")
+        navigation.navigate("Tabs")
       })
       .catch(() => {
         Alert.alert("Erro", "Crendeciais incorretas")
