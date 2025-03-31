@@ -14,11 +14,22 @@ import { ScrollView } from "react-native-gesture-handler";
 import axios from "axios";
 
 export default function CreateAccount({ navigation }) {
+  
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [cpf, setCpf] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+
+  function handleChangeCpf(value: string) {
+    const cpfOnlyDigits = value.replace(/\D/g, ''); 
+    const formattedCpf = cpfOnlyDigits
+      .replace(/(\d{3})(\d)/, '$1.$2') 
+      .replace(/(\d{3})(\d)/, '$1.$2') 
+      .replace(/(\d{3})(\d{1,2})$/, '$1-$2'); 
+
+    setCpf(formattedCpf);
+  }
 
   const handleCreateAccount = () => {
     if (!name) {
@@ -33,6 +44,7 @@ export default function CreateAccount({ navigation }) {
     } else if (password !== confirmPassword) {
       Alert.alert("Aviso", "As senhas não coincidem");
     } else {
+
       axios
         .post(
           "http://192.168.0.37:3000/users",
@@ -70,6 +82,7 @@ export default function CreateAccount({ navigation }) {
             Crie uma conta agora e ganhe seu cartão de crédito com R$ 1000,00 de
             limite!
           </Text>
+
           <TextInput
             style={styles.input}
             placeholder="Nome completo"
@@ -96,7 +109,8 @@ export default function CreateAccount({ navigation }) {
             cursorColor="#150230"
             keyboardType="number-pad"
             value={cpf}
-            onChangeText={setCpf}
+            onChangeText={handleChangeCpf}
+            maxLength={14}
           />
 
           <TextInput

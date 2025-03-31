@@ -11,6 +11,8 @@ import {
   Button,
 } from "react-native";
 
+import ItemList from "./ItemList";
+
 const values = [
   {
     value: 20,
@@ -38,6 +40,22 @@ const values = [
   },
 ];
 
+
+const DddOptions = [
+  {
+    value: '85',
+    label: '85'
+  },
+  {
+    value: '55',
+    label: '55'
+  },
+  {
+    value: '44',
+    label: '44'
+  }
+]
+
 type Operator = {
   id: number;
   name: string;
@@ -52,12 +70,51 @@ export default function Recharges() {
 
   const [operatorsOptions, setOperatorsOptions] = useState<Operator[]>([])
 
+  const [ddd, setDdd] = useState('')
+
+  
   function handleChangeValue(valueOption: number) {
     setValue(valueOption);
   }
 
+  function handleChangeDdd(valueOption: string) {
+    setDdd(valueOption);
+  }
+
   function handleChangeOperator(operatorOption: string) {
     setOperator(operatorOption);
+  }
+
+
+  function handleCreateRecharge(){
+    const regexPhone = /^\(\d{2}\)\s\d{5}-\d{4}$/
+
+      if(!regexPhone.test(phone)) {
+        Alert.alert("Aviso", "O telefone está no formato inválido")
+      } else if(!value) {
+        Alert.alert("Aviso","Selecione um valor")
+      } else if(!operator) {
+        Alert.alert("Aviso", "Selecione uma operadora")
+      } else {
+
+        axios.post("http://192.168.0.37:3000/recharges", {
+          number: phone,
+          value: value,
+          operator: operator
+        })
+        .then(() => {
+          Alert.alert("Aviso", "Recarga realizada com sucesso")
+
+         
+
+        })
+        .catch(() => Alert.alert("Aviso", "Não foi possivel realizar a recarga. Tente novamente em alguns minutos."))
+        .finally(() => {
+          setPhone("")
+          setValue(0)
+          setOperator("")
+        })
+      }
   }
 
   useEffect(() => {
@@ -84,23 +141,11 @@ export default function Recharges() {
 
       <Text>Escolha a valor que deseja recarregar ? </Text>
 
-      <View style={styles.rechargeOptionContainer}>
-        {values.map((item) => (
-          <TouchableOpacity
-           key={item.value}
-            onPress={() => handleChangeValue(item.value)}
-            style={[
-              styles.rechargeOption,
-              { backgroundColor: item.value === value ? "#CCC" : "#150230" },
-            ]}
-          >
-            <Text style={styles.rechargeTextOption}>{item.label}</Text>
-          </TouchableOpacity>
-        ))}
-      </View>
+      <ItemList options={values} handleChangeValue={handleChangeValue} value={value} />
+
+      {/* <ItemList options={DddOptions} handleChangeValue={handleChangeDdd} value={ddd} /> */}
 
       <Text>Escolha a operadora ?</Text>
-
       {operatorsOptions.map((item) => (
         <TouchableOpacity
           key={item.id}
@@ -120,7 +165,7 @@ export default function Recharges() {
         </TouchableOpacity>
       ))}
 
-      <Button title="Confirmar" onPress={() => Alert.alert("Recarga confirmada")} />
+      <Button title="Confirmar" onPress={handleCreateRecharge} />
     </View>
   );
 }

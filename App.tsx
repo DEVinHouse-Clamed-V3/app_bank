@@ -1,4 +1,4 @@
-import { SafeAreaView, StatusBar, Text } from "react-native";
+import { SafeAreaView, StatusBar } from "react-native";
 import Icon from "@expo/vector-icons/MaterialCommunityIcons";
 
 import { NavigationContainer } from "@react-navigation/native";
