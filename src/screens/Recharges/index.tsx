@@ -40,39 +40,36 @@ const values = [
   },
 ];
 
-
 const DddOptions = [
   {
-    value: '85',
-    label: '85'
+    value: "85",
+    label: "85",
   },
   {
-    value: '55',
-    label: '55'
+    value: "55",
+    label: "55",
   },
   {
-    value: '44',
-    label: '44'
-  }
-]
+    value: "44",
+    label: "44",
+  },
+];
 
 type Operator = {
   id: number;
   name: string;
   cover: string;
-}
+};
 
 export default function Recharges() {
-
   const [phone, setPhone] = useState("");
   const [value, setValue] = useState(0);
   const [operator, setOperator] = useState("");
 
-  const [operatorsOptions, setOperatorsOptions] = useState<Operator[]>([])
+  const [operatorsOptions, setOperatorsOptions] = useState<Operator[]>([]);
 
-  const [ddd, setDdd] = useState('')
+  const [ddd, setDdd] = useState("");
 
-  
   function handleChangeValue(valueOption: number) {
     setValue(valueOption);
   }
@@ -85,46 +82,47 @@ export default function Recharges() {
     setOperator(operatorOption);
   }
 
+  function handleCreateRecharge() {
+    const regexPhone = /^\(\d{2}\)\s\d{5}-\d{4}$/;
 
-  function handleCreateRecharge(){
-    const regexPhone = /^\(\d{2}\)\s\d{5}-\d{4}$/
-
-      if(!regexPhone.test(phone)) {
-        Alert.alert("Aviso", "O telefone está no formato inválido")
-      } else if(!value) {
-        Alert.alert("Aviso","Selecione um valor")
-      } else if(!operator) {
-        Alert.alert("Aviso", "Selecione uma operadora")
-      } else {
-
-        axios.post("http://192.168.0.37:3000/recharges", {
+    if (!regexPhone.test(phone)) {
+      Alert.alert("Aviso", "O telefone está no formato inválido");
+    } else if (!value) {
+      Alert.alert("Aviso", "Selecione um valor");
+    } else if (!operator) {
+      Alert.alert("Aviso", "Selecione uma operadora");
+    } else {
+      axios
+        .post("http://192.168.0.37:3000/recharges", {
           number: phone,
           value: value,
-          operator: operator
+          operator: operator,
         })
         .then(() => {
-          Alert.alert("Aviso", "Recarga realizada com sucesso")
-
-         
-
+          Alert.alert("Aviso", "Recarga realizada com sucesso");
         })
-        .catch(() => Alert.alert("Aviso", "Não foi possivel realizar a recarga. Tente novamente em alguns minutos."))
+        .catch(() =>
+          Alert.alert(
+            "Aviso",
+            "Não foi possivel realizar a recarga. Tente novamente em alguns minutos."
+          )
+        )
         .finally(() => {
-          setPhone("")
-          setValue(0)
-          setOperator("")
-        })
-      }
+          setPhone("");
+          setValue(0);
+          setOperator("");
+        });
+    }
   }
 
   useEffect(() => {
-    axios.get("http://192.168.0.37:3000/operadoras")
-    .then((response) => {
-      setOperatorsOptions(response.data)
-    })
-    .catch(() => Alert.alert("Erro ao carregar operadoras"))
-
-  }, [])
+    axios
+      .get("http://192.168.0.37:3000/operadoras")
+      .then((response) => {
+        setOperatorsOptions(response.data);
+      })
+      .catch(() => Alert.alert("Erro ao carregar operadoras"));
+  }, []);
 
   return (
     <View style={styles.container}>
@@ -141,7 +139,11 @@ export default function Recharges() {
 
       <Text>Escolha a valor que deseja recarregar ? </Text>
 
-      <ItemList options={values} handleChangeValue={handleChangeValue} value={value} />
+      <ItemList
+        options={values}
+        handleChangeValue={handleChangeValue}
+        value={value}
+      />
 
       {/* <ItemList options={DddOptions} handleChangeValue={handleChangeDdd} value={ddd} /> */}
 
@@ -150,16 +152,18 @@ export default function Recharges() {
         <TouchableOpacity
           key={item.id}
           onPress={() => handleChangeOperator(item.name)}
-          style={[styles.operatorOption, {backgroundColor: item.name === operator ? "#CCC" : "#FFF"}]}
+          style={[
+            styles.operatorOption,
+            { backgroundColor: item.name === operator ? "#CCC" : "#FFF" },
+          ]}
         >
           <Image
             source={{
               uri: item.cover,
               width: 40,
               height: 40,
-              
             }}
-            style={{objectFit: 'contain'}}
+            style={{ objectFit: "contain" }}
           />
           <Text>{item.name}</Text>
         </TouchableOpacity>
