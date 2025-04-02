@@ -74,9 +74,7 @@ export default function CreateAccount({ navigation }) {
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <View style={styles.container}>
         <ScrollView>
-          <Text style={{ color: "#FFF" }}>
-            {password.length > 6 ? "senha é forte" : "senha fraca"}
-          </Text>
+          
           <Text style={styles.createAccountText}>Criar conta</Text>
           <Text style={styles.descriptionText}>
             Crie uma conta agora e ganhe seu cartão de crédito com R$ 1000,00 de
