@@ -12,6 +12,7 @@ import Header from "./Header";
 import axios from "axios";
 import Icon from "@expo/vector-icons/MaterialCommunityIcons";
 
+
 interface Card {
   numero: string;
   nome: string;

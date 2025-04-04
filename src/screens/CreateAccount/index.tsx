@@ -12,6 +12,7 @@ import {
 import { ScrollView } from "react-native-gesture-handler";
 
 import axios from "axios";
+import { formatCpf } from "../../utils/formatCpf";
 
 export default function CreateAccount({ navigation }) {
   
@@ -22,13 +23,7 @@ export default function CreateAccount({ navigation }) {
   const [confirmPassword, setConfirmPassword] = useState("");
 
   function handleChangeCpf(value: string) {
-    const cpfOnlyDigits = value.replace(/\D/g, ''); 
-    const formattedCpf = cpfOnlyDigits
-      .replace(/(\d{3})(\d)/, '$1.$2') 
-      .replace(/(\d{3})(\d)/, '$1.$2') 
-      .replace(/(\d{3})(\d{1,2})$/, '$1-$2'); 
-
-    setCpf(formattedCpf);
+    setCpf(formatCpf(value));
   }
 
   const handleCreateAccount = () => {

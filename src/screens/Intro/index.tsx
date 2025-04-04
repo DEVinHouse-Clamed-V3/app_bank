@@ -21,6 +21,7 @@ export default function Intro({ navigation }: any) {
       <Image
         source={require("../../../assets/Logo.png")}
         style={styles.bankLogo}
+        testID="bank-logo"
       />
 
       <View>
