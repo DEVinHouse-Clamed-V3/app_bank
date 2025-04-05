@@ -9,9 +9,10 @@ import {
   Image,
   Alert,
 } from "react-native";
+import { login } from "../../actions/auth.actions";
+import { formatCpf } from "../../utils/formatCpf";
 
 export default function Login({ navigation }: any) {
-
   const [cpf, setCpf] = useState("");
   const [password, setPassword] = useState("");
 
@@ -20,28 +21,26 @@ export default function Login({ navigation }: any) {
   }
 
   function handleLogin() {
-    if(!cpf || !password) {
-      Alert.alert("Aviso", "Preencha todos os campos")
+    if (!cpf || !password) {
+      Alert.alert("Aviso", "Preencha todos os campos");
     } else {
-      axios.post(
-        "http://192.168.0.37:3000/login",
-        {
-          cpf: cpf,
-          password: password
-        }
-      )
-      .then((response) => {
+      login(cpf, password)
+        .then((response) => {
+         
+          const token = response.data.token;
 
-        const token = response.data.token
-
-        Alert.alert("Sucesso", token)
-        navigation.navigate("Tabs")
-      })
-      .catch(() => {
-        Alert.alert("Erro", "Crendeciais incorretas")
-      }) 
+          Alert.alert("Sucesso", token);
+          navigation.navigate("Tabs");
+        })
+        .catch(() => {
+          Alert.alert("Erro", "Crendeciais incorretas");
+        });
     }
   }
+
+  function handleChangeCpf(value: string) {
+      setCpf(formatCpf(value));
+    }
 
   // function handleChangeCpf(value: string) {
   //   const cpfOnlyDigits = value.replace(/\D/g, '')
@@ -61,7 +60,8 @@ export default function Login({ navigation }: any) {
         cursorColor="#150230"
         keyboardType="number-pad"
         value={cpf}
-        onChangeText={setCpf}
+        onChangeText={handleChangeCpf}
+        testID="input-cpf"
       />
 
       <TextInput
@@ -71,13 +71,14 @@ export default function Login({ navigation }: any) {
         secureTextEntry
         value={password}
         onChangeText={setPassword}
+        testID="input-password"
       />
 
       <TouchableOpacity>
         <Text style={styles.linkText}>Esqueceu a senha ?</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity onPress={handleLogin} style={styles.buttonLogin}>
+      <TouchableOpacity testID="button-login" onPress={handleLogin} style={styles.buttonLogin}>
         <Text>Entrar</Text>
       </TouchableOpacity>
 
