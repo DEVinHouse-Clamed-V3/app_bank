@@ -1,4 +1,3 @@
-import axios from "axios";
 import { useState } from "react";
 import {
   View,
@@ -32,8 +31,8 @@ export default function Login({ navigation }: any) {
           Alert.alert("Sucesso", token);
           navigation.navigate("Tabs");
         })
-        .catch(() => {
-          Alert.alert("Erro", "Crendeciais incorretas");
+        .catch((error) => {
+          Alert.alert("Erro", error.response.data?.error || "Erro ao fazer login");
         });
     }
   }

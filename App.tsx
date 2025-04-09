@@ -57,7 +57,7 @@ export default function App() {
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <NavigationContainer>
-        <Stack.Navigator initialRouteName="Tabs">
+        <Stack.Navigator initialRouteName="Intro">
           <Stack.Screen
             name="Login"
             component={Login}

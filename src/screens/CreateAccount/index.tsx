@@ -13,17 +13,23 @@ import { ScrollView } from "react-native-gesture-handler";
 
 import axios from "axios";
 import { formatCpf } from "../../utils/formatCpf";
+import ItemList from "../Recharges/ItemList";
 
 export default function CreateAccount({ navigation }) {
-  
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [cpf, setCpf] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [income, setIncome] = useState("");
+  const [gender, SetGender] = useState("");
 
   function handleChangeCpf(value: string) {
     setCpf(formatCpf(value));
+  }
+
+  function handleChangeGender(value: string) {
+    SetGender(value);
   }
 
   const handleCreateAccount = () => {
@@ -38,30 +44,36 @@ export default function CreateAccount({ navigation }) {
       );
     } else if (password !== confirmPassword) {
       Alert.alert("Aviso", "As senhas não coincidem");
+    } else if (!gender) {
+      Alert.alert("Aviso", "Selecione o seu gênero");
     } else {
-
       axios
         .post(
-          "http://192.168.0.37:3000/users",
+          "http://192.168.0.37:3000/users/register",
           {
             name: name,
             email: email,
-            cpf: cpf,
+            document: cpf,
             password: password,
+            income: income,
+            gender: gender,
           },
           {
             headers: {
               "Content-Type": "application/json",
             },
-           }
+          }
         )
         .then(() => {
           Alert.alert("Sucesso", "Conta criada com sucesso!");
           navigation.navigate("Login");
         })
         .catch((error) => {
-          Alert.alert("Erro", "Não possível criar a conta");
-        })
+          Alert.alert(
+            "Erro",
+            error.response.data?.error || "Erro ao criar conta"
+          );
+        });
     }
   };
 
@@ -69,7 +81,6 @@ export default function CreateAccount({ navigation }) {
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <View style={styles.container}>
         <ScrollView>
-          
           <Text style={styles.createAccountText}>Criar conta</Text>
           <Text style={styles.descriptionText}>
             Crie uma conta agora e ganhe seu cartão de crédito com R$ 1000,00 de
@@ -123,6 +134,25 @@ export default function CreateAccount({ navigation }) {
             value={confirmPassword}
             onChangeText={setConfirmPassword}
           />
+
+          <TextInput
+            style={styles.input}
+            placeholder="Qual é a sua renda ?"
+            cursorColor="#150230"
+            keyboardType="number-pad"
+            value={income}
+            onChangeText={setIncome}
+          />
+
+          <ItemList
+            options={[
+              { value: "M", label: "Masculino" },
+              { value: "F", label: "Feminino" },
+            ]}
+            value={gender}
+            handleChangeValue={handleChangeGender}
+          />
+
           <TouchableOpacity
             onPress={handleCreateAccount}
             style={styles.buttonLogin}

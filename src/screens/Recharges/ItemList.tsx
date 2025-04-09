@@ -1,8 +1,8 @@
 import { Text, TouchableOpacity, View, StyleSheet } from "react-native";
 
 interface ItemListProps {
-  options: {value: number, label: string}[];
-  handleChangeValue(valueOption: number): void;
+  options: {value: number | string, label: string}[];
+  handleChangeValue(valueOption: number | string): void;
   value: string | number;
 }
 
