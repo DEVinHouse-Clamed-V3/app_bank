@@ -10,6 +10,8 @@ import {
 } from "react-native";
 import { login } from "../../actions/auth.actions";
 import { formatCpf } from "../../utils/formatCpf";
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 
 export default function Login({ navigation }: any) {
   const [cpf, setCpf] = useState("");
@@ -25,10 +27,10 @@ export default function Login({ navigation }: any) {
     } else {
       login(cpf, password)
         .then((response) => {
-         
-          const token = response.data.token;
+          
+          AsyncStorage.setItem("@name", response.data.name)
+          AsyncStorage.setItem("@token", response.data.token)
 
-          Alert.alert("Sucesso", token);
           navigation.navigate("Tabs");
         })
         .catch((error) => {

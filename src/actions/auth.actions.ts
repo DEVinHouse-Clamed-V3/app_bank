@@ -2,6 +2,7 @@ import axios from "axios"
 
 interface LoginResponse {
     token: string
+    name: string
 }
 
 export const login = (cpf: string, password: string) => {

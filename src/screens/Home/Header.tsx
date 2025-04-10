@@ -1,17 +1,56 @@
-import React, { useState } from "react";
-import { View, Text, StyleSheet, Image, TouchableOpacity } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import axios from "axios";
+import React, { useEffect, useState } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Image,
+  TouchableOpacity,
+  Alert,
+} from "react-native";
 
 const Header = () => {
-  const saldo = "R$ 1500"; // Valor de saldo do usuário
-  const name = "Henrique Douglas Calcante Costa".split(" ");
-  const firtName = name[0];
+  // Valor de saldo do usuário
+
+  const [name, setName] = useState("");
+  const [balance, setBalance] = useState(0);
 
   const [showBalance, setShowBalance] = useState(false);
+
+  async function getName() {
+    const currentName = (await AsyncStorage.getItem("@name")) || "";
+    const firstName = currentName?.split(" ")[0];
+    setName(firstName);
+  }
+
+  useEffect(() => {
+    getName();
+  }, []);
+
+  async function getBalance() {
+    const token = await AsyncStorage.getItem("@token");
+
+    axios
+      .get("http://192.168.0.37:3000/clients/balance", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+      .then((response) => {
+        setBalance(response.data.balance);
+      })
+      .catch(() => Alert.alert("Erro", "Erro ao buscar saldo"));
+  }
+
+  useEffect(() => {
+    getBalance();
+  }, []);
 
   return (
     <View style={styles.header}>
       <View>
-        <Text style={styles.totalMoney}>{showBalance ? saldo : "***"}</Text>
+        <Text style={styles.totalMoney}>{showBalance ? balance : "***"}</Text>
         <Text style={styles.yourMoneyText}>Seu saldo</Text>
         <TouchableOpacity
           onPress={() => setShowBalance(!showBalance)}
@@ -26,14 +65,14 @@ const Header = () => {
       <View>
         <Image
           source={{
-            uri: "https://lh3.googleusercontent.com/a/ACg8ocKcl_rB94Py1qw03nYRxBD4mHOuyMZawCHt_vclTr8jqQC82Sk=s192-c-mo",
+            uri: "https://cdn-icons-png.flaticon.com/512/3686/3686930.png",
             width: 50,
             height: 50,
           }}
           style={{ borderRadius: 30, alignSelf: "center" }}
           testID="photo-user"
         />
-        <Text style={styles.userName}>{firtName}</Text>
+        <Text style={styles.userName}>{name}</Text>
       </View>
     </View>
   );
