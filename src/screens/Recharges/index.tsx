@@ -12,6 +12,7 @@ import {
 } from "react-native";
 
 import ItemList from "./ItemList";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const values = [
   {
@@ -82,7 +83,7 @@ export default function Recharges() {
     setOperator(operatorOption);
   }
 
-  function handleCreateRecharge() {
+  async function handleCreateRecharge() {
     const regexPhone = /^\(\d{2}\)\s\d{5}-\d{4}$/;
 
     if (!regexPhone.test(phone)) {
@@ -92,12 +93,22 @@ export default function Recharges() {
     } else if (!operator) {
       Alert.alert("Aviso", "Selecione uma operadora");
     } else {
+      const token = await AsyncStorage.getItem("@token");
+
       axios
-        .post("http://192.168.0.37:3000/recharges", {
-          number: phone,
-          value: value,
-          operator: operator,
-        })
+        .post(
+          "http://192.168.0.37:3000/recharges",
+          {
+            number: phone,
+            value: value,
+            operator: operator,
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        )
         .then(() => {
           Alert.alert("Aviso", "Recarga realizada com sucesso");
         })
@@ -115,13 +126,23 @@ export default function Recharges() {
     }
   }
 
-  useEffect(() => {
+  async function getOperators() {
+    const token = await AsyncStorage.getItem("@token");
+
     axios
-      .get("http://192.168.0.37:3000/operadoras")
+      .get("http://192.168.0.37:3000/operators", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
       .then((response) => {
         setOperatorsOptions(response.data);
       })
       .catch(() => Alert.alert("Erro ao carregar operadoras"));
+  }
+
+  useEffect(() => {
+    getOperators();
   }, []);
 
   return (

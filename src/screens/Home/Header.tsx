@@ -1,4 +1,5 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useFocusEffect } from "@react-navigation/native";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import {
@@ -43,9 +44,9 @@ const Header = () => {
       .catch(() => Alert.alert("Erro", "Erro ao buscar saldo"));
   }
 
-  useEffect(() => {
+  useFocusEffect(() => {
     getBalance();
-  }, []);
+  });
 
   return (
     <View style={styles.header}>

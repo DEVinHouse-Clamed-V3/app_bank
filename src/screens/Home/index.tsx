@@ -11,13 +11,16 @@ import {
 import Header from "./Header";
 import axios from "axios";
 import Icon from "@expo/vector-icons/MaterialCommunityIcons";
-
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 interface Card {
-  numero: string;
-  nome: string;
+  id: number;
+  client_id: number;
+  placeholder: string;
+  number: string;
   cvv: string;
-  dataExpiracao: string;
+  expiration_date: string;
+  limit: string;
 }
 
 enum TransactionType {
@@ -49,13 +52,23 @@ const Home = () => {
   //     }
   //   }
 
-  useEffect(() => {
+  async function getCards() {
+    const token = await AsyncStorage.getItem("@token");
+
     axios
-      .get("http://192.168.0.37:3000/cartoes")
+      .get("http://192.168.0.37:3000/creditCards", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        }
+      })
       .then((response) => {
         setCards(response.data);
       })
       .catch(() => Alert.alert("Erro ao pegar os cartões"));
+  }
+
+  useEffect(() => {
+    getCards();
   }, []);
 
   useEffect(() => {
@@ -75,14 +88,14 @@ const Home = () => {
       <View style={{ height: 220 }}>
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
           {cards.map((item) => (
-            <View key={item.numero} style={styles.creditCard}>
+            <View key={item.number} style={styles.creditCard}>
               <View>
-                <Text style={styles.numberCard}>{item.numero}</Text>
-                <Text style={styles.nameCard}>{item.nome}</Text>
+                <Text style={styles.numberCard}>{item.number}</Text>
+                <Text style={styles.nameCard}>{item.placeholder}</Text>
 
                 <View style={styles.footerCard}>
                   <Text style={styles.expirationDateCard}>
-                    Valid. {item.dataExpiracao}
+                    Valid. {item.expiration_date}
                   </Text>
                   <Text style={styles.expirationDateCard}>Cvv: {item.cvv}</Text>
                 </View>
@@ -104,7 +117,6 @@ const Home = () => {
             {item.items.map((transactionItem) => (
               <View key={transactionItem.id} style={styles.transactionItem}>
                 <View style={styles.leftContentTransactionItem}>
-               
                   {transactionItem.tipo === TransactionType.ENTRADA ? (
                     <Icon name="plus-circle" size={30} color="#26d826" />
                   ) : (
