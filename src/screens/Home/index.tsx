@@ -7,11 +7,20 @@ import {
   Dimensions,
   Text,
   FlatList,
+  Button,
 } from "react-native";
 import Header from "./Header";
 import axios from "axios";
 import Icon from "@expo/vector-icons/MaterialCommunityIcons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+
+import DateTimePicker, {
+  DateTimePickerEvent,
+} from "@react-native-community/datetimepicker";
+
+import { format } from "date-fns";
+
+import { ptBR } from "date-fns/locale";
 
 interface Card {
   id: number;
@@ -29,19 +38,23 @@ enum TransactionType {
 }
 
 interface Transaction {
-  data: string;
-  items: {
-    id: number;
-    data: string;
-    tipo: TransactionType;
-    descricao: string;
-    valor: string;
-  }[];
+  id: number;
+  client_id: number;
+  value: number;
+  type: TransactionType;
+  description: string;
+  balance: number;
+  created_at: string;
+  updated_at: string;
 }
 
 const Home = () => {
   const [cards, setCards] = useState<Card[]>([]);
-  const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [movements, setMovements] = useState<Transaction[]>([]);
+  const [dateFilter, setDateFilter] = useState(
+    new Date()
+  );
+  const [openCalendar, setOpenCalendar] = useState(false);
 
   //   const getCards = async () => {
   //     try {
@@ -52,6 +65,14 @@ const Home = () => {
   //     }
   //   }
 
+  const onChangeDateFilter = (
+    _event: DateTimePickerEvent,
+    selectedDate?: Date
+  ) => {
+    if (selectedDate) setDateFilter(selectedDate);
+    setOpenCalendar(false);
+  };
+
   async function getCards() {
     const token = await AsyncStorage.getItem("@token");
 
@@ -59,7 +80,7 @@ const Home = () => {
       .get("http://192.168.0.37:3000/creditCards", {
         headers: {
           Authorization: `Bearer ${token}`,
-        }
+        },
       })
       .then((response) => {
         setCards(response.data);
@@ -71,14 +92,29 @@ const Home = () => {
     getCards();
   }, []);
 
-  useEffect(() => {
+  async function getMovements() {
+    const token = await AsyncStorage.getItem("@token");
+
+    const dateParams = format(dateFilter, "yyyy-MM-dd");
+
     axios
-      .get("http://192.168.0.37:3000/transacoes")
-      .then((response) => {
-        setTransactions(response.data);
+      .get("http://192.168.0.37:3000/movements", {
+        params: {
+          date: dateParams,
+        },
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       })
-      .catch(() => Alert.alert("Erro ao pegar as transações"));
-  }, []);
+      .then((response) => {
+        setMovements(response.data);
+      });
+  }
+
+  useEffect(() => {
+    console.log("Data selecionada:", dateFilter);
+    getMovements();
+  }, [dateFilter]);
 
   return (
     <View style={styles.container}>
@@ -107,31 +143,43 @@ const Home = () => {
 
       <Text style={styles.myCards}>Minhas transações</Text>
 
+      <Button
+        title={format(dateFilter, "dd 'de' MMMM 'de' yyyy", { locale: ptBR })}
+        onPress={() => setOpenCalendar(true)}
+      />
+
+      {openCalendar && (
+        <DateTimePicker
+          testID="dateTimePicker"
+          value={dateFilter}
+          mode="date"
+          is24Hour={true}
+          onChange={onChangeDateFilter}
+        />
+      )}
+
       <FlatList
-        data={transactions}
-        keyExtractor={(item) => item.data}
+        data={movements}
+        keyExtractor={(item) => item.id.toString()}
+        ListEmptyComponent={() => <Text>Não tem nada nesse dia</Text>}
         renderItem={({ item }) => (
-          <View>
-            <Text style={styles.dateItem}>{item.data}</Text>
+          <View key={item.id} style={styles.transactionItem}>
+            <View style={styles.leftContentTransactionItem}>
+              {item.type === TransactionType.ENTRADA ? (
+                <Icon name="plus-circle" size={30} color="#26d826" />
+              ) : (
+                <Icon name="minus-circle" size={30} color="#d82926" />
+              )}
 
-            {item.items.map((transactionItem) => (
-              <View key={transactionItem.id} style={styles.transactionItem}>
-                <View style={styles.leftContentTransactionItem}>
-                  {transactionItem.tipo === TransactionType.ENTRADA ? (
-                    <Icon name="plus-circle" size={30} color="#26d826" />
-                  ) : (
-                    <Icon name="minus-circle" size={30} color="#d82926" />
-                  )}
-
-                  <Text style={styles.descriptionTransactionItem}>
-                    {transactionItem.descricao}
-                  </Text>
-                </View>
-                <Text style={styles.valueTransactionItem}>
-                  R$ {transactionItem.valor}
-                </Text>
-              </View>
-            ))}
+              <Text
+                style={styles.descriptionTransactionItem}
+                numberOfLines={2}
+                ellipsizeMode="tail"
+              >
+                {item.description}
+              </Text>
+            </View>
+            <Text style={styles.valueTransactionItem}>R$ {item.value}</Text>
           </View>
         )}
       />
@@ -187,15 +235,16 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     backgroundColor: "#150230",
-    height: 54,
+    height: 100,
     borderRadius: 8,
     padding: 5,
-    marginBottom: 20,
+    marginVertical: 10,
   },
   leftContentTransactionItem: {
     flexDirection: "row",
     gap: 5,
     alignItems: "center",
+    width: "70%",
   },
   descriptionTransactionItem: {
     fontSize: 18,
