@@ -12,6 +12,7 @@ import CreateAccount from "./src/screens/CreateAccount";
 import Home from "./src/screens/Home";
 import Profile from "./src/screens/Profile";
 import Recharges from "./src/screens/Recharges";
+import { navigationRef } from "./src/services/navigationService";
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -56,7 +57,7 @@ function Tabs() {
 export default function App() {
   return (
     <SafeAreaView style={{ flex: 1 }}>
-      <NavigationContainer>
+      <NavigationContainer ref={navigationRef}>
         <Stack.Navigator initialRouteName="Intro">
           <Stack.Screen
             name="Login"

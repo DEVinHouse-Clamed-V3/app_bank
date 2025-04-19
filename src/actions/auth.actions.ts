@@ -1,4 +1,4 @@
-import axios from "axios"
+import api from "../services/api"
 
 interface LoginResponse {
     token: string
@@ -6,7 +6,7 @@ interface LoginResponse {
 }
 
 export const login = (cpf: string, password: string) => {
-    return axios.post<LoginResponse>("http://192.168.0.37:3000/login" , {
+    return api.post<LoginResponse>("/login" , {
         document: cpf,
         password: password
     })

@@ -1,6 +1,6 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useFocusEffect } from "@react-navigation/native";
-import axios from "axios";
+
 import React, { useEffect, useState } from "react";
 import {
   View,
@@ -10,6 +10,7 @@ import {
   TouchableOpacity,
   Alert,
 } from "react-native";
+import api from "../../services/api";
 
 const Header = () => {
   // Valor de saldo do usuário
@@ -30,14 +31,9 @@ const Header = () => {
   }, []);
 
   async function getBalance() {
-    const token = await AsyncStorage.getItem("@token");
-
-    axios
-      .get("http://192.168.0.37:3000/clients/balance", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
+   
+    api
+      .get("/clients/balance")
       .then((response) => {
         setBalance(response.data.balance);
       })

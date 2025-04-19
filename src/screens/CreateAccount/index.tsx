@@ -11,9 +11,10 @@ import {
 } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 
-import axios from "axios";
+
 import { formatCpf } from "../../utils/formatCpf";
 import ItemList from "../Recharges/ItemList";
+import api from "../../services/api";
 
 export default function CreateAccount({ navigation }) {
   const [name, setName] = useState("");
@@ -47,9 +48,9 @@ export default function CreateAccount({ navigation }) {
     } else if (!gender) {
       Alert.alert("Aviso", "Selecione o seu gênero");
     } else {
-      axios
+      api
         .post(
-          "http://192.168.0.37:3000/users/register",
+          "/users/register",
           {
             name: name,
             email: email,

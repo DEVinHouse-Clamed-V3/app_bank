@@ -10,7 +10,7 @@ import {
   Button,
 } from "react-native";
 import Header from "./Header";
-import axios from "axios";
+
 import Icon from "@expo/vector-icons/MaterialCommunityIcons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
@@ -21,6 +21,7 @@ import DateTimePicker, {
 import { format } from "date-fns";
 
 import { ptBR } from "date-fns/locale";
+import api from "../../services/api";
 
 interface Card {
   id: number;
@@ -74,14 +75,9 @@ const Home = () => {
   };
 
   async function getCards() {
-    const token = await AsyncStorage.getItem("@token");
-
-    axios
-      .get("http://192.168.0.37:3000/creditCards", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
+    
+    api
+      .get("http://192.168.0.37:3000/creditCards")
       .then((response) => {
         setCards(response.data);
       })
@@ -93,18 +89,15 @@ const Home = () => {
   }, []);
 
   async function getMovements() {
-    const token = await AsyncStorage.getItem("@token");
+   
 
     const dateParams = format(dateFilter, "yyyy-MM-dd");
 
-    axios
+    api
       .get("http://192.168.0.37:3000/movements", {
         params: {
           date: dateParams,
-        },
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        }
       })
       .then((response) => {
         setMovements(response.data);

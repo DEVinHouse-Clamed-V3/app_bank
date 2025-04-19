@@ -1,4 +1,3 @@
-import axios from "axios";
 import { useState, useEffect } from "react";
 import {
   Text,
@@ -13,6 +12,7 @@ import {
 
 import ItemList from "./ItemList";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import api from "../../services/api";
 
 const values = [
   {
@@ -93,20 +93,14 @@ export default function Recharges() {
     } else if (!operator) {
       Alert.alert("Aviso", "Selecione uma operadora");
     } else {
-      const token = await AsyncStorage.getItem("@token");
-
-      axios
+    
+      api
         .post(
-          "http://192.168.0.37:3000/recharges",
+          "/recharges",
           {
             number: phone,
             value: value,
             operator: operator,
-          },
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
           }
         )
         .then(() => {
@@ -127,14 +121,9 @@ export default function Recharges() {
   }
 
   async function getOperators() {
-    const token = await AsyncStorage.getItem("@token");
-
-    axios
-      .get("http://192.168.0.37:3000/operators", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
+  
+    api
+      .get("/operators")
       .then((response) => {
         setOperatorsOptions(response.data);
       })
